@@ -183,18 +183,19 @@ if st.button("🚀 RUN PIPELINE", use_container_width=True):
         try:
             proc = subprocess.Popen(
                 cmd, cwd=_REPO_ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                text=True, bufsize=1, encoding="utf-8", errors="replace"
+                universal_newlines=True, encoding="utf-8", bufsize=1
             )
-
-            if proc.stdout:
-                for line in iter(proc.stdout.readline, ""):
-                    captured_lines.append(line)
-                    display_text = "".join(captured_lines[-40:])
-                    log_box.code(display_text, language="shell")
+            for line in iter(proc.stdout.readline, ""):
+                captured_lines.append(line)
+                log_box.code("".join(captured_lines), language="text")
             proc.wait()
-
+            
             if proc.returncode == 0:
-                st.success("✅ Pipeline completed successfully!")
+                st.success("✅ Pipeline completed successfully! Refreshing UI...")
+                time.sleep(1.5)
+                if tid_clean:
+                    st.session_state.selected_task_file = os.path.join(_TASKS_DIR, f"{tid_clean}.json")
+                st.rerun()
             else:
                 st.error("❌ Pipeline finished with an error. Check the logs above.")
 
@@ -233,52 +234,49 @@ for f in task_files:
     except Exception:
         pass
 
-if pending_tasks:
-    st.markdown("---")
-    st.markdown("### 👀 Pending Human Approvals")
+@st.dialog("👀 Action Required: Human Approval")
+def review_modal(f_path, t_data):
+    tid = t_data.get("task_id", "Unknown")
+    freq = t_data.get("feature_request", "")
+    diff = t_data.get("code_diff", "")
     
-    for f_path, t_data in pending_tasks:
-        tid = t_data.get("task_id", "Unknown")
-        freq = t_data.get("feature_request", "")
-        diff = t_data.get("code_diff", "")
-        
-        st.markdown(f"""
-        <div class="approval-card">
-            <h4>Task: {tid}</h4>
-            <p><i>{freq}</i></p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.code(diff, language="diff")
-        
-        acol1, acol2, _ = st.columns([1, 1, 4])
-        
-        with acol1:
-            st.markdown('<div class="approve-btn">', unsafe_allow_html=True)
-            if st.button("✅ Approve & Apply", key=f"approve_{tid}"):
-                t_data["status"] = "approved"
-                with open(f_path, "w", encoding="utf-8") as f_out:
-                    json.dump(t_data, f_out, indent=2)
-                
-                st.info(f"Applying fixes for task {tid}...")
+    st.markdown(f"**Task:** {tid}")
+    st.markdown(f"**Request:** *{freq}*")
+    st.code(diff, language="diff")
+    
+    st.markdown("---")
+    acol1, acol2 = st.columns(2)
+    with acol1:
+        st.markdown('<div class="approve-btn">', unsafe_allow_html=True)
+        if st.button("✅ Approve & Apply", key=f"approve_{tid}", use_container_width=True):
+            t_data["status"] = "approved"
+            with open(f_path, "w", encoding="utf-8") as f_out:
+                json.dump(t_data, f_out, indent=2)
+            
+            with st.spinner(f"Applying fixes for {tid}..."):
                 apply_cmd = [sys.executable, "orchestration/apply_fixes.py", "--repo", target_repo]
                 try:
                     res = subprocess.run(apply_cmd, cwd=_REPO_ROOT, capture_output=True, text=True)
                     if res.returncode == 0:
-                        st.success(f"Changes applied successfully!\n\n{res.stdout}")
+                        st.success("Changes applied successfully!")
+                        time.sleep(1)
                         st.rerun()
                     else:
                         st.error(f"Failed to apply fixes:\n{res.stderr}")
                 except Exception as e:
                     st.error(f"Error executing apply_fixes.py: {e}")
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-        with acol2:
-            st.markdown('<div class="reject-btn">', unsafe_allow_html=True)
-            if st.button("❌ Reject", key=f"reject_{tid}"):
-                t_data["status"] = "rejected"
-                with open(f_path, "w", encoding="utf-8") as f_out:
-                    json.dump(t_data, f_out, indent=2)
-                st.warning(f"Task {tid} rejected.")
-                st.rerun()
-            st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+    with acol2:
+        st.markdown('<div class="reject-btn">', unsafe_allow_html=True)
+        if st.button("❌ Reject", key=f"reject_{tid}", use_container_width=True):
+            t_data["status"] = "rejected"
+            with open(f_path, "w", encoding="utf-8") as f_out:
+                json.dump(t_data, f_out, indent=2)
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+if pending_tasks:
+    # Pop up the dialog for the first pending task automatically
+    f_path, t_data = pending_tasks[0]
+    review_modal(f_path, t_data)
