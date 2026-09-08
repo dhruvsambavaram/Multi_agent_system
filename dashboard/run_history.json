@@ -2482,5 +2482,160 @@
         "success": true
       }
     ]
+  },
+  {
+    "run_id": 82,
+    "timestamp": "2026-09-08T18:23:38.602779+00:00",
+    "task_id": "live_749",
+    "agent_rates": {
+      "pm_agent": 1.0,
+      "architect_agent": 1.0,
+      "coding_agent": 1.0,
+      "testing_agent": 1.0,
+      "review_agent": 1.0
+    },
+    "reflections_triggered": [],
+    "agent_timings": [
+      {
+        "agent": "pm_agent",
+        "duration_s": 1.24,
+        "success": true
+      },
+      {
+        "agent": "architect_agent",
+        "duration_s": 1.12,
+        "success": true
+      },
+      {
+        "agent": "coding_agent",
+        "duration_s": 0.83,
+        "success": true
+      },
+      {
+        "agent": "testing_agent",
+        "duration_s": 1.12,
+        "success": true
+      },
+      {
+        "agent": "review_agent",
+        "duration_s": 1.44,
+        "success": true
+      }
+    ]
+  },
+  {
+    "run_id": 83,
+    "timestamp": "2026-09-08T18:39:48.310203+00:00",
+    "task_id": "live_331",
+    "agent_rates": {
+      "pm_agent": 1.0,
+      "architect_agent": 1.0,
+      "coding_agent": 1.0,
+      "testing_agent": 1.0,
+      "review_agent": 1.0
+    },
+    "reflections_triggered": [],
+    "agent_timings": [
+      {
+        "agent": "pm_agent",
+        "duration_s": 3.27,
+        "success": true
+      },
+      {
+        "agent": "architect_agent",
+        "duration_s": 2.01,
+        "success": true
+      },
+      {
+        "agent": "coding_agent",
+        "duration_s": 4.42,
+        "success": true
+      },
+      {
+        "agent": "testing_agent",
+        "duration_s": 25.79,
+        "success": true
+      },
+      {
+        "agent": "review_agent",
+        "duration_s": 45.02,
+        "success": true
+      }
+    ]
+  },
+  {
+    "run_id": 84,
+    "timestamp": "2026-09-08T18:54:13.115718+00:00",
+    "task_id": "live_513",
+    "agent_rates": {
+      "pm_agent": 1.0,
+      "architect_agent": 1.0,
+      "coding_agent": 1.0,
+      "testing_agent": 1.0,
+      "review_agent": 1.0
+    },
+    "reflections_triggered": [],
+    "agent_timings": [
+      {
+        "agent": "pm_agent",
+        "duration_s": 1.35,
+        "success": true
+      },
+      {
+        "agent": "architect_agent",
+        "duration_s": 3.51,
+        "success": true
+      },
+      {
+        "agent": "coding_agent",
+        "duration_s": 3.53,
+        "success": true
+      },
+      {
+        "agent": "testing_agent",
+        "duration_s": 48.84,
+        "success": true
+      },
+      {
+        "agent": "review_agent",
+        "duration_s": 22.83,
+        "success": true
+      }
+    ]
+  },
+  {
+    "run_id": 85,
+    "timestamp": "2026-09-08T18:58:45.548146+00:00",
+    "task_id": "live_882",
+    "agent_rates": {
+      "pm_agent": 1.0,
+      "architect_agent": 1.0,
+      "coding_agent": 0.8,
+      "testing_agent": 1.0,
+      "review_agent": 1.0
+    },
+    "reflections_triggered": [],
+    "agent_timings": [
+      {
+        "agent": "pm_agent",
+        "duration_s": 1.39,
+        "success": true
+      },
+      {
+        "agent": "architect_agent",
+        "duration_s": 1.64,
+        "success": true
+      },
+      {
+        "agent": "coding_agent",
+        "duration_s": 4.22,
+        "success": true
+      },
+      {
+        "agent": "testing_agent",
+        "duration_s": 0.04,
+        "success": false
+      }
+    ]
   }
 ]
