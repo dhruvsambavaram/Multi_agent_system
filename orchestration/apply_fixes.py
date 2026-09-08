@@ -131,8 +131,11 @@ def _apply_diff_direct(diff_text: str, repo_path: str) -> tuple[bool, str]:
         if not section.strip():
             continue
 
-        # Extract target filename from +++ b/<path> line
-        plus_match = re.search(r"^\+\+\+ b/(.+)$", section, re.MULTILINE)
+        # Extract target filename from +++ b/<path> line (or +++ <path>)
+        plus_match = re.search(r"^\+\+\+(?:\s+b/|\s+)(.+?)\s*$", section, re.MULTILINE)
+        if not plus_match:
+            continue
+            
         rel_path = plus_match.group(1).strip().replace("\\", "/").lstrip("/")
         if "<path>" in rel_path:
             continue
