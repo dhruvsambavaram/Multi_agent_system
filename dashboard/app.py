@@ -158,8 +158,13 @@ st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True)
 # Run Button
 st.markdown('<div class="primary-btn">', unsafe_allow_html=True)
 if st.button("🚀 RUN PIPELINE", use_container_width=True):
+    tid_clean = task_id.strip()
+    task_file_path = os.path.join(_TASKS_DIR, f"{tid_clean}.json") if tid_clean else None
+    
     if not user_request.strip():
         st.error("Please enter a feature request first.")
+    elif task_file_path and os.path.exists(task_file_path):
+        st.error(f"Task ID `{tid_clean}` already exists. Please choose a different Task ID or click 'New chat' to auto-generate one.")
     else:
         st.info(f"Running command: `python orchestration/pipeline.py --repo {target_repo} --request \"...\"`")
         
