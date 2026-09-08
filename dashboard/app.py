@@ -72,7 +72,7 @@ if "form_reset_counter" not in st.session_state:
 
 # --- SIDEBAR LOGIC ---
 with st.sidebar:
-    st.markdown("<h2>ChatGPT Style History</h2>", unsafe_allow_html=True)
+    st.markdown("<h2>History</h2>", unsafe_allow_html=True)
     st.markdown('<div class="sidebar-new-btn">', unsafe_allow_html=True)
     if st.button("📝 New chat (Reset)", use_container_width=True):
         st.session_state.form_reset_counter += 1
@@ -91,28 +91,28 @@ with st.sidebar:
             try:
                 with open(f, "r", encoding="utf-8") as f_in:
                     data = json.load(f_in)
-                    t_id = data.get("task_id", os.path.basename(f))
-                    t_req = data.get("feature_request", "No description")
-                    t_status = data.get("status", "")
+                t_id = data.get("task_id", os.path.basename(f))
+                t_req = data.get("feature_request", "No description")
+                t_status = data.get("status", "")
+                
+                # Truncate description for sidebar
+                if len(t_req) > 35:
+                    t_req = t_req[:32] + "..."
                     
-                    # Truncate description for sidebar
-                    if len(t_req) > 35:
-                        t_req = t_req[:32] + "..."
-                        
-                    # 2-column layout for the history item and the delete button
-                    scol1, scol2 = st.columns([4, 1])
-                    with scol1:
-                        icon = "👀" if t_status == "awaiting_human_approval" else "✅" if t_status in ("approved", "verified_fixed") else "📄"
-                        if st.button(f"{icon} {t_id}\n{t_req}", key=f"sel_{t_id}", use_container_width=True):
-                            st.session_state.selected_task_file = f
-                            st.rerun()
-                    with scol2:
-                        if st.button("🗑️", key=f"del_{t_id}"):
-                            os.remove(f)
-                            if st.session_state.get("selected_task_file") == f:
-                                st.session_state.selected_task_file = None
-                            st.rerun()
-            except Exception:
+                # 2-column layout for the history item and the delete button
+                scol1, scol2 = st.columns([4, 1])
+                with scol1:
+                    icon = "👀" if t_status == "awaiting_human_approval" else "✅" if t_status in ("approved", "verified_fixed") else "📄"
+                    if st.button(f"{icon} {t_id}\n{t_req}", key=f"sel_{t_id}", use_container_width=True):
+                        st.session_state.selected_task_file = f
+                        st.rerun()
+                with scol2:
+                    if st.button("🗑️", key=f"del_{t_id}"):
+                        os.remove(f)
+                        if st.session_state.get("selected_task_file") == f:
+                            st.session_state.selected_task_file = None
+                        st.rerun()
+            except Exception as e:
                 pass
 
 # Load selected task data if present
