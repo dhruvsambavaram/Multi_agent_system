@@ -76,6 +76,7 @@ with st.sidebar:
     st.markdown('<div class="sidebar-new-btn">', unsafe_allow_html=True)
     if st.button("📝 New chat (Reset)", use_container_width=True):
         st.session_state.form_reset_counter += 1
+        st.session_state.selected_task_file = None
         st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
     
@@ -101,14 +102,36 @@ with st.sidebar:
                     # 2-column layout for the history item and the delete button
                     scol1, scol2 = st.columns([4, 1])
                     with scol1:
-                        icon = "👀" if t_status == "awaiting_human_approval" else "✅" if t_status == "approved" else "📄"
-                        st.markdown(f"**{t_id}** {icon}<br><span style='font-size:0.8em;'>{t_req}</span>", unsafe_allow_html=True)
+                        icon = "👀" if t_status == "awaiting_human_approval" else "✅" if t_status in ("approved", "verified_fixed") else "📄"
+                        if st.button(f"{icon} {t_id}\n{t_req}", key=f"sel_{t_id}", use_container_width=True):
+                            st.session_state.selected_task_file = f
+                            st.rerun()
                     with scol2:
                         if st.button("🗑️", key=f"del_{t_id}"):
                             os.remove(f)
+                            if st.session_state.get("selected_task_file") == f:
+                                st.session_state.selected_task_file = None
                             st.rerun()
             except Exception:
                 pass
+
+# Load selected task data if present
+loaded_req = ""
+loaded_repo = "sample_repo/flaskbb"
+loaded_tid = f"live_{int(time.time()) % 1000:03d}"
+loaded_diff = None
+loaded_plan = None
+
+if st.session_state.get("selected_task_file") and os.path.exists(st.session_state.selected_task_file):
+    try:
+        with open(st.session_state.selected_task_file, "r", encoding="utf-8") as f_in:
+            sel_data = json.load(f_in)
+            loaded_req = sel_data.get("feature_request", "")
+            loaded_tid = sel_data.get("task_id", "")
+            loaded_diff = sel_data.get("code_diff")
+            loaded_plan = sel_data.get("plan")
+    except Exception:
+        pass
 
 
 # --- MAIN CONTENT ---
@@ -121,14 +144,14 @@ key_suffix = st.session_state.form_reset_counter
 
 with col1:
     st.markdown("<p><b>ENTER REQUESTS:-</b></p>", unsafe_allow_html=True)
-    user_request = st.text_area("Request", key=f"req_{key_suffix}", label_visibility="collapsed", placeholder="create a testers.py that prints hi", height=140)
+    user_request = st.text_area("Request", key=f"req_{key_suffix}", label_visibility="collapsed", value=loaded_req, placeholder="create a testers.py that prints hi", height=140)
 
 with col2:
     st.markdown("<p><b>project directory</b></p>", unsafe_allow_html=True)
-    target_repo = st.text_input("Repo", key=f"repo_{key_suffix}", label_visibility="collapsed", value="sample_repo/flaskbb")
+    target_repo = st.text_input("Repo", key=f"repo_{key_suffix}", label_visibility="collapsed", value=loaded_repo)
     st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
     st.markdown("<p><b>Task-ID (optional):</b></p>", unsafe_allow_html=True)
-    task_id = st.text_input("Task", key=f"task_{key_suffix}", label_visibility="collapsed", value=f"live_{int(time.time()) % 1000:03d}")
+    task_id = st.text_input("Task", key=f"task_{key_suffix}", label_visibility="collapsed", value=loaded_tid)
 
 st.markdown("<div style='height: 25px;'></div>", unsafe_allow_html=True)
 
@@ -175,6 +198,24 @@ if st.button("🚀 RUN PIPELINE", use_container_width=True):
             
 st.markdown('</div>', unsafe_allow_html=True)
 
+# Display historical data if selected
+if loaded_diff or loaded_plan:
+    st.markdown("---")
+    st.markdown(f"### 🕒 History for Task: `{loaded_tid}`")
+    
+    tab1, tab2 = st.tabs(["💻 Code Diff", "📋 Architect Plan"])
+    
+    with tab1:
+        if loaded_diff:
+            st.code(loaded_diff, language="diff")
+        else:
+            st.info("No code changes were generated for this task.")
+            
+    with tab2:
+        if loaded_plan:
+            st.markdown(loaded_plan)
+        else:
+            st.info("No architectural plan was generated.")
 
 # --- HUMAN APPROVAL SECTION ---
 pending_tasks = []
