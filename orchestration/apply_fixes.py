@@ -499,7 +499,7 @@ def git_commit(repo_path: str, task_id: str, feature_request: str) -> dict:
         # git commit
         msg = f"Applied fix for task {task_id}: {feature_request}"
         commit_result = subprocess.run(
-            ["git", "commit", "-m", msg],
+            ["git", "-c", "user.name=AI Dev Team", "-c", "user.email=ai-dev-team@bot.local", "commit", "-m", msg],
             cwd=repo_path,
             capture_output=True,
             text=True,
