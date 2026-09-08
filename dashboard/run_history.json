@@ -2442,5 +2442,45 @@
         "success": true
       }
     ]
+  },
+  {
+    "run_id": 81,
+    "timestamp": "2026-09-08T18:10:39.536660+00:00",
+    "task_id": "live_613",
+    "agent_rates": {
+      "pm_agent": 1.0,
+      "architect_agent": 1.0,
+      "coding_agent": 1.0,
+      "testing_agent": 1.0,
+      "review_agent": 1.0
+    },
+    "reflections_triggered": [],
+    "agent_timings": [
+      {
+        "agent": "pm_agent",
+        "duration_s": 0.9,
+        "success": true
+      },
+      {
+        "agent": "architect_agent",
+        "duration_s": 0.79,
+        "success": true
+      },
+      {
+        "agent": "coding_agent",
+        "duration_s": 0.52,
+        "success": true
+      },
+      {
+        "agent": "testing_agent",
+        "duration_s": 0.83,
+        "success": true
+      },
+      {
+        "agent": "review_agent",
+        "duration_s": 0.51,
+        "success": true
+      }
+    ]
   }
 ]
