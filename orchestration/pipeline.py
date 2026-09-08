@@ -601,6 +601,22 @@ def run_pipeline(
                                 if getattr(sync_exc, "errno", None) in (2, 9, 13):
                                     cfa_note = " (Windows Defender Controlled Folder Access may be blocking writes in Documents)"
                                 print(f"[pipeline] [!] Could not sync {sf} to workspace: {sync_exc}{cfa_note}")
+                    
+                    # Auto-commit and push if running on cloud
+                    if res.get("applied"):
+                        try:
+                            from orchestration.apply_fixes import git_commit
+                            commit_res = git_commit(
+                                repo_path=_REPO_ROOT, 
+                                task_id=task.get("task_id", "auto"), 
+                                feature_request=task.get("feature_request", "Auto-applied pipeline task")
+                            )
+                            if commit_res.get("committed"):
+                                print(f"[pipeline] [OK] Auto-committed and pushed to GitHub: {commit_res.get('commit_output', '').strip()}")
+                            else:
+                                print(f"[pipeline] [!] Could not auto-commit: {commit_res.get('commit_output', '').strip()}")
+                        except Exception as e:
+                            print(f"[pipeline] [!] Auto-commit failed: {e}")
                 except Exception as exc:
                     print(f"[pipeline] Warning: could not auto-apply diff to {repo_path}: {exc}")
             break
