@@ -44,7 +44,10 @@
         "blocked",
         "awaiting_human_approval",
         "approved",
-        "rejected"
+        "rejected",
+        "verified_fixed",
+        "verified_failed",
+        "apply_failed"
       ],
       "description": "Current lifecycle state of the task."
     },
@@ -147,6 +150,50 @@
       "minimum": 0,
       "maximum": 2,
       "description": "Number of Review -> Coding retries so far. Hard capped at 2 -- on the 3rd rejection, escalate to a human instead of looping."
+    },
+    "verification_result": {
+      "type": ["object", "null"],
+      "description": "Written by apply_fixes.py after git apply + flake8 verification. Null until apply_fixes.py runs.",
+      "properties": {
+        "applied": { "type": "boolean" },
+        "git_apply_output": { "type": "string" },
+        "flake8_passed": { "type": "boolean" },
+        "flake8_output": { "type": "string" },
+        "verified_at": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "batch_index": {
+      "type": ["integer", "null"],
+      "description": "Phase 2: which batch number this task represents in a build run."
+    },
+    "total_batches": {
+      "type": ["integer", "null"],
+      "description": "Phase 2: total number of batches planned for this build run."
+    },
+    "project_name": {
+      "type": ["string", "null"],
+      "description": "Phase 2: name of the generated project this task belongs to."
+    },
+    "approved": {
+      "type": ["boolean", "null"],
+      "description": "True if approved by human sign-off."
+    },
+    "approved_at": {
+      "type": ["string", "null"],
+      "description": "ISO 8601 timestamp when human approval occurred."
+    },
+    "consensus_report": {
+      "type": ["object", "null"],
+      "description": "Multi-agent cross-stage confidence and agreement score."
+    },
+    "manager_report": {
+      "type": ["object", "null"],
+      "description": "Manager Agent performance audit report."
+    },
+    "reflection_results": {
+      "type": ["array", "null"],
+      "description": "Results of Reflection prompt rewriting if triggered."
     }
   },
 

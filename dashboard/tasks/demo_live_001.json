@@ -1,0 +1,44 @@
+{
+  "task_id": "demo_live_001",
+  "feature_request": "Add rate limiting to the login endpoint",
+  "acceptance_criteria": [
+    "Login attempts limited to 5 per minute per IP",
+    "Returns 429 status after limit",
+    "Rate limit resets after 60 seconds"
+  ],
+  "status": "awaiting_human_approval",
+  "current_agent": "review_agent",
+  "plan": "Implement Flask-Limiter for the /login route.",
+  "history": [
+    {
+      "agent": "pm_agent",
+      "success": true,
+      "output_summary": "Created spec"
+    },
+    {
+      "agent": "architect_agent",
+      "success": true,
+      "output_summary": "Architecture mapped"
+    },
+    {
+      "agent": "coding_agent",
+      "success": true,
+      "output_summary": "Rate limit code generated"
+    },
+    {
+      "agent": "testing_agent",
+      "success": true,
+      "output_summary": "Tests passing"
+    },
+    {
+      "agent": "review_agent",
+      "success": true,
+      "output_summary": "Approved"
+    }
+  ],
+  "code_diff": "--- app.py\n+++ app.py\n@@ -10,0 +11,3 @@\n+from flask_limiter import Limiter\n+from flask_limiter.util import get_remote_address\n+\n@@ -15,0 +19,2 @@\n+limiter = Limiter(get_remote_address, app=app, default_limits=[\"200 per day\", \"50 per hour\"])\n+\n@@ -22,0 +28,2 @@\n+@limiter.limit(\"5 per minute\")\n+def login():",
+  "review_result": {
+    "passed": true,
+    "findings": []
+  }
+}
