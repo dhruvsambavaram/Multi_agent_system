@@ -509,9 +509,23 @@ def git_commit(repo_path: str, task_id: str, feature_request: str) -> dict:
                 "committed": False,
                 "commit_output": f"git commit failed: {commit_result.stderr[:200]}",
             }
+            
+        # git push (to sync back to GitHub for cloud deployments)
+        push_output = ""
+        push_result = subprocess.run(
+            ["git", "push"],
+            cwd=repo_path,
+            capture_output=True,
+            text=True,
+        )
+        if push_result.returncode == 0:
+            push_output = "\n(Successfully pushed to remote repository!)"
+        else:
+            push_output = f"\n(Note: Commit succeeded, but 'git push' failed. If running in a cloud container, ensure git authentication is configured. Error: {push_result.stderr[:100]})"
+
         return {
             "committed": True,
-            "commit_output": commit_result.stdout[:500] or "(committed)",
+            "commit_output": (commit_result.stdout[:500] or "(committed)") + push_output,
         }
     except Exception as exc:
         return {

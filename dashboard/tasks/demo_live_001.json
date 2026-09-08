@@ -6,7 +6,7 @@
     "Returns 429 status after limit",
     "Rate limit resets after 60 seconds"
   ],
-  "status": "awaiting_human_approval",
+  "status": "approved",
   "current_agent": "review_agent",
   "plan": "Implement Flask-Limiter for the /login route.",
   "history": [
